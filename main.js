@@ -5,6 +5,7 @@ const topScreen = document.querySelector('.topScreen');
 const equals = document.querySelector('.equals');
 const operatorsArray = ["+","-","×","÷"]
 const dot = document.querySelector('.dot');
+const clear = document.querySelector('.clear');
 
 add = (num1, num2) => (num1 + num2);
 subtract = (num1, num2) => (num1 - num2);
@@ -49,6 +50,8 @@ function DisplayDigit(digitObject) {
 
 function n1digitClicked(event) {
 
+    
+
     if (n1Array.length == 0 && this.textContent == '.') {
         n1Array.unshift("0");
         console.log("dotclicked!")
@@ -69,6 +72,9 @@ function n1digitClicked(event) {
 }
 
 function n2digitClicked(event) {
+
+    
+
     if (n2Array.length == 0 && this.textContent == '.') {
         n2Array.unshift("0");
         console.log("dotclicked!")
@@ -188,6 +194,13 @@ function computeN1withN2(n1,n2) {
     // console.log(`current operator: ${operatorBeforeN2}`);
     // console.log(`n2: ${n2}`);
     answer = operate(window[operatorBeforeN2],n1,n2);
+
+    if (!Number.isFinite(answer)) {
+        alert("Can't divide by zero!");
+        location.reload();
+        return;
+    }
+
     console.log(`answer: ${answer}`);
     return answer;
 }
@@ -289,6 +302,7 @@ function pair () {
     digits.forEach((digit) => digit.addEventListener('click', n1digitClicked));
     operators.forEach((operator) => operator.addEventListener('click', operatorClicked))
     equals.addEventListener('click', appendEquals);
+    clear.addEventListener('click', () => location.reload())
 }
 
 function initiate() {
