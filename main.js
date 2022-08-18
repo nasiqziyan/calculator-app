@@ -17,8 +17,8 @@ power = (num1, num2) => (Math.pow(num1,num2));
 
 
 let n1Array = ['0'];
-let n2Array = [];
-let n3Array = [];
+let n2Array = ['0'];
+let n3Array = ['0'];
 let waitingForNumber = false;
 let WaitingForN1 = false;
 let WaitingForN2 = false;
@@ -54,7 +54,7 @@ function n1digitClicked(event) {
         console.log("dotclicked!")
     }
 
-    console.log(`includes dot? ${n3Array.includes('.')}`)
+    // console.log(`includes dot? ${n3Array.includes('.')}`)
 
     if (n1Array.includes('.') && this.textContent == '.') {
         return
@@ -74,7 +74,7 @@ function n2digitClicked(event) {
         console.log("dotclicked!")
     }
 
-    console.log(`includes dot? ${n3Array.includes('.')}`)
+    // console.log(`includes dot? ${n3Array.includes('.')}`)
 
     if (n2Array.includes('.') && this.textContent == '.') {
         return
@@ -93,13 +93,24 @@ function n3digitClicked(event) {
         console.log("dotclicked!")
     }
     
-    console.log(`includes dot? ${n3Array.includes('.')}`)
+    // console.log(`includes dot? ${n3Array.includes('.')}`)
     
     if (n3Array.includes('.') && this.textContent == '.') {
         return
     }
 
-    n3Array.push(this.textContent);
+    if (currentScreen.textContent.split('') != n3Array && (currentScreen.textContent[0] != ' ') && !currentScreen.textContent.includes("+") 
+                                                                                                && !currentScreen.textContent.includes("-")
+                                                                                                && !currentScreen.textContent.includes("÷")
+                                                                                                && !currentScreen.textContent.includes("×")) {
+        n3Array = currentScreen.textContent.split('')
+        n3Array.push(this.textContent);
+    }
+
+    else {
+        n3Array.push(this.textContent);
+    }
+    
     DisplayDigit(this);
     WaitingForN3 = true;
     waitingForNumber = false;
@@ -164,6 +175,8 @@ function ConvertMathOperatorToText(operator) {
 
 function computeN1withN2(n1,n2) {
     if (Array.isArray(n1) && Array.isArray(n2)) {
+        n1Array.unshift('0');
+        n2Array.unshift('0');
         n1 = +n1Array.join("");
         n2 = +n2Array.join("");
     }
@@ -171,9 +184,9 @@ function computeN1withN2(n1,n2) {
     if (operatorBeforeN2 == 'equals') {
         return
     }
-    console.log(`n1: ${n1}`);
-    console.log(`current operator: ${operatorBeforeN2}`);
-    console.log(`n2: ${n2}`);
+    console.log(`n1: ${n1}, current operator: ${operatorBeforeN2}, n2: ${n2}`);
+    // console.log(`current operator: ${operatorBeforeN2}`);
+    // console.log(`n2: ${n2}`);
     answer = operate(window[operatorBeforeN2],n1,n2);
     console.log(`answer: ${answer}`);
     return answer;
@@ -183,10 +196,11 @@ function operatorClicked(event) {
     
     if (!NumberClicked) return
 
-    console.log(this.textContent)
+    // console.log(this.textContent)
 
     if (waitingForNumber) {
         console.log("inlimbo");
+        if (this.textContent == '=') return;
         changeOperator();
         DisplayOperator(this);
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
@@ -194,12 +208,17 @@ function operatorClicked(event) {
         return;
     }
 
+    // if (waitingForNumber && this.textContent == '=') return;
+
     if (!WaitingForN2) {
         console.log("branch1");
+        if (this.textContent == '=') return;
+
         digits.forEach((digit) => digit.removeEventListener('click', n1digitClicked));
         digits.forEach((digit) => digit.addEventListener('click', n2digitClicked)); 
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
-        console.log(`operator before n2 B1: ${operatorBeforeN2}`)
+        // console.log(`operator before n2 B1: ${operatorBeforeN2}`)
+        
     }
 
     if (WaitingForN1 && WaitingForN2 && !WaitingForN3) {
@@ -208,12 +227,16 @@ function operatorClicked(event) {
         digits.forEach((digit) => digit.removeEventListener('click', n2digitClicked)); 
         digits.forEach((digit) => digit.addEventListener('click', n3digitClicked)); 
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
-        console.log(`operator before n2: B2 ${operatorBeforeN2}`)
+        // console.log(`operator before n2: B2 ${operatorBeforeN2}`)
         
     }
 
     if (WaitingForN1 && WaitingForN2 && WaitingForN3) {
-        console.log("branch3")
+        console.log("branch3");
+
+        // if (currentScreen.textContent.includes("+"))
+        // n3Array = currentScreen.textContent.split().slice(0,-3);
+       
         if (typeof answer == 'undefined') {
             n1Array = n2Array;
             
@@ -221,17 +244,19 @@ function operatorClicked(event) {
             n1Array = [`${answer}`];
         }
         
+
+            
         
         n2Array = n3Array;
         
-        console.log(`this operator: ${this.textContent}`);
+        // console.log(`this operator: ${this.textContent}`);
         answer = computeN1withN2(n1Array,n2Array);
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
+
+        // if (n3Array == n2Array)
         n3Array = [];
-        console.log(`operator before n2 B3: ${operatorBeforeN2}`)
+        // console.log(`operator before n2 B3: ${operatorBeforeN2}`)
         
-        // digits.forEach((digit) => digit.removeEventListener('click', n3digitClicked)); 
-        // digits.forEach((digit) => digit.addEventListener('click', n2digitClicked));
 
         
     }
