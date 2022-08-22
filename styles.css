@@ -75,6 +75,7 @@ html {
 button {
     font-family: 'Courier New', Courier, monospace;
     font-size: 30px;
+    font-weight: bold;
     color: white;
     background-color: var(--btn);
     border: none;
@@ -88,6 +89,7 @@ button {
     text-align: center;
     font-size: 32px;
     padding-bottom: 12px;
+    font-weight: bold;
     /* border: 1px solid red; */
 }
 
@@ -100,7 +102,7 @@ button {
 
 .currentScreen {
     font-size: 36px;
-    min-height: 42px;
+    min-height: 43px;
     display: flex;
     justify-content: right;
     align-items: center;
