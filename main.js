@@ -32,41 +32,38 @@ function DisplayDigit(digitObject) {
     currentScreen.append(digitValue);
 }
 
+function preventMultipleDot(nArray,buttonClicked) {
+
+    if (nArray.length == 0 && buttonClicked.textContent == '.') {
+        n1Array.unshift("0");
+    }
+
+    if (nArray.includes('.') && buttonClicked.textContent == '.') {
+        return true
+    }
+
+}
+
 function n1digitClicked(event) {
 
     [n1active, n2active, n3active] = [true, false, false];
-
-    if (n1Array.length == 0 && this.textContent == '.') {
-        n1Array.unshift("0");
-        console.log("dotclicked!")
-    }
-
-    if (n1Array.includes('.') && this.textContent == '.') {
-        return
-    }
     
+    buttonClicked = this;
+    if (preventMultipleDot(n1Array,buttonClicked)) return;
+ 
     n1Array.push(this.textContent);
     DisplayDigit(this);
     WaitingForN1 = true;
     waitingForNumber = false;
     NumberClicked = true;
-    console.log("n1active");
 }
 
 function n2digitClicked(event) {
 
     [n1active, n2active, n3active] = [false, true, false];
 
-    if (n2Array.length == 0 && this.textContent == '.') {
-        n2Array.unshift("0");
-        console.log("dotclicked!")
-    }
-
-    // console.log(`includes dot? ${n3Array.includes('.')}`)
-
-    if (n2Array.includes('.') && this.textContent == '.') {
-        return
-    }
+    buttonClicked = this;
+    if (preventMultipleDot(n2Array,buttonClicked)) return;
     
     n2Array.push(this.textContent);
     DisplayDigit(this);
@@ -79,21 +76,10 @@ function n3digitClicked(event) {
 
     [n1active, n2active, n3active] = [false, false, true];
     
-    if (n3Array.length == 0 && this.textContent == '.') {
-        n3Array.unshift("0");
-        console.log("dotclicked!")
-    }
-    
-    // console.log(`includes dot? ${n3Array.includes('.')}`)
-    
-    if (n3Array.includes('.') && this.textContent == '.') {
-        return
-    }
+    buttonClicked = this;
+    if (preventMultipleDot(n3Array,buttonClicked)) return;
 
-    if (currentScreen.textContent.split('') != n3Array && (currentScreen.textContent[0] != ' ') && !currentScreen.textContent.includes("+") 
-                                                                                                && !currentScreen.textContent.includes("-")
-                                                                                                && !currentScreen.textContent.includes("÷")
-                                                                                                && !currentScreen.textContent.includes("×")) {
+    if (currentScreen.textContent.split('') != n3Array && (currentScreen.textContent[0] != ' ') && !operatorsArray.find(el => currentScreen.textContent.includes(el))) {
         n3Array = currentScreen.textContent.split('')
         n3Array.push(this.textContent);
     }
@@ -105,28 +91,12 @@ function n3digitClicked(event) {
     DisplayDigit(this);
     WaitingForN3 = true;
     waitingForNumber = false;
-    console.log("n3active");
+
 }
 
 function DisplayOperator(operatorObject) {
-    // if (operatorObject.textContent == '=') {
-    //     if (!equals.classList.contains('active')) {
-    //         console.log("changing topscreen");
-    //         topScreen.textContent = operatorObject.textContent + ' ' + topScreen.textContent;
-    //         equals.classList.add('active');
-        
-    //     } else return;
-
-        
-    // }
-
-    // else currentScreen.append(` ${operatorObject.textContent} `);
-    
     if (operatorObject.textContent == '=') return;
-
-    currentScreen.append(` ${operatorObject.textContent} `);
-
-        
+    currentScreen.append(` ${operatorObject.textContent} `);       
 }
 
 function changeOperator() {
@@ -172,12 +142,8 @@ function computeN1withN2(n1,n2) {
         n2 = +n2Array.join("");
     }
     
-    if (operatorBeforeN2 == 'equals') {
-        return
-    }
-    console.log(`n1: ${n1}, current operator: ${operatorBeforeN2}, n2: ${n2}`);
-    // console.log(`current operator: ${operatorBeforeN2}`);
-    // console.log(`n2: ${n2}`);
+    if (operatorBeforeN2 == 'equals') return 
+
     answer = operate(window[operatorBeforeN2],n1,n2);
 
     if (!Number.isFinite(answer)) {
@@ -186,21 +152,15 @@ function computeN1withN2(n1,n2) {
         return;
     }
 
-    console.log(`answer: ${answer}`);
     return answer;
 }
 
 function operatorClicked(event) {
     
     n1active = n2active = n3active = false;
-    // opActive = true;
-
     if (!NumberClicked) return
 
-    // console.log(this.textContent)
-
     if (waitingForNumber) {
-        console.log("inlimbo");
         if (this.textContent == '=') return;
         changeOperator();
         DisplayOperator(this);
@@ -209,17 +169,13 @@ function operatorClicked(event) {
         return;
     }
 
-    // if (waitingForNumber && this.textContent == '=') return;
-
     if (!WaitingForN2) {
-        console.log("branch1");
+
         if (this.textContent == '=') return;
 
         digits.forEach((digit) => digit.removeEventListener('click', n1digitClicked));
         digits.forEach((digit) => digit.addEventListener('click', n2digitClicked)); 
-        operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
-        // console.log(`operator before n2 B1: ${operatorBeforeN2}`)
-        
+        operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);     
     }
 
     if (WaitingForN1 && WaitingForN2 && !WaitingForN3) {
@@ -228,15 +184,10 @@ function operatorClicked(event) {
         digits.forEach((digit) => digit.removeEventListener('click', n2digitClicked)); 
         digits.forEach((digit) => digit.addEventListener('click', n3digitClicked)); 
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
-        // console.log(`operator before n2: B2 ${operatorBeforeN2}`)
-        
     }
 
     if (WaitingForN1 && WaitingForN2 && WaitingForN3) {
         console.log("branch3");
-
-        // if (currentScreen.textContent.includes("+"))
-        // n3Array = currentScreen.textContent.split().slice(0,-3);
        
         if (typeof answer == 'undefined') {
             n1Array = n2Array;
@@ -244,25 +195,13 @@ function operatorClicked(event) {
         } else {
             n1Array = [`${answer}`];
         }
-        
-
             
-        
-        n2Array = n3Array;
-        
-        // console.log(`this operator: ${this.textContent}`);
+        n2Array = n3Array;  
         answer = computeN1withN2(n1Array,n2Array);
         operatorBeforeN2 = ConvertMathOperatorToText(this.textContent);
-
-        // if (n3Array == n2Array)
         n3Array = [];
-        // console.log(`operator before n2 B3: ${operatorBeforeN2}`)
-        
-
-        
     }
 
-    
     waitingForNumber = true;
 
     if (typeof answer !== 'undefined') {
@@ -297,10 +236,7 @@ function deleteClicked() {
         } 
     }
 
-    console.log(` true one is: ${foundTrue}`);
-
     currentText = currentScreen.textContent;
-    
 
     switch (foundTrue) {
         case 'n1active':
@@ -330,15 +266,6 @@ function deleteClicked() {
             }
             break;
 
-        case 'opActive':
-            // console.log("opactivee")
-            // currentText = currentText.slice(0,-1);
-            // currentScreen.textContent = currentText; 
-            // console.log(`n1array length = ${n1Array.length}`)
-            // if (!(n3Array.length <= 1)) n3Array.pop(); 
-            break;
-    
-    
         default:
             break;
     }
@@ -355,10 +282,7 @@ function pair () {
 }
 
 function initiate() {
-    // initVariables();
     pair();
 }
-
-
 
 initiate();
