@@ -6,16 +6,7 @@ const equals = document.querySelector('.equals');
 const operatorsArray = ["+","-","×","÷"]
 const dot = document.querySelector('.dot');
 const clear = document.querySelector('.clear');
-
-add = (num1, num2) => (num1 + num2);
-subtract = (num1, num2) => (num1 - num2);
-multiply = (num1, num2) => (num1 * num2);
-divide = (num1, num2) => (num1 / num2);
-operate = (operator, num1, num2) => operator(num1,num2);
-
-power = (num1, num2) => (Math.pow(num1,num2));
-
-
+const del = document.querySelector('.del');
 
 let n1Array = ['0'];
 let n2Array = ['0'];
@@ -28,36 +19,27 @@ let NumberClicked = false;
 let answer;
 let n1;
 
-function initVariables() {
-    n1Array = ['0'];
-    n2Array = ['0'];
-    n3Array = ['0'];
-    waitingForNumber = false;
-    WaitingForN1 = false;
-    WaitingForN2 = false;
-    WaitingForN3 = false;
-    NumberClicked = false;
-    n1;
-}
+add = (num1, num2) => (num1 + num2);
+subtract = (num1, num2) => (num1 - num2);
+multiply = (num1, num2) => (num1 * num2);
+divide = (num1, num2) => (num1 / num2);
+operate = (operator, num1, num2) => operator(num1,num2);
 
 
 
 function DisplayDigit(digitObject) {
     digitValue = digitObject.textContent;
-    // console.log(digitValue);
     currentScreen.append(digitValue);
 }
 
 function n1digitClicked(event) {
 
-    
+    [n1active, n2active, n3active] = [true, false, false];
 
     if (n1Array.length == 0 && this.textContent == '.') {
         n1Array.unshift("0");
         console.log("dotclicked!")
     }
-
-    // console.log(`includes dot? ${n3Array.includes('.')}`)
 
     if (n1Array.includes('.') && this.textContent == '.') {
         return
@@ -73,7 +55,7 @@ function n1digitClicked(event) {
 
 function n2digitClicked(event) {
 
-    
+    [n1active, n2active, n3active] = [false, true, false];
 
     if (n2Array.length == 0 && this.textContent == '.') {
         n2Array.unshift("0");
@@ -94,6 +76,9 @@ function n2digitClicked(event) {
 }
 
 function n3digitClicked(event) {
+
+    [n1active, n2active, n3active] = [false, false, true];
+    
     if (n3Array.length == 0 && this.textContent == '.') {
         n3Array.unshift("0");
         console.log("dotclicked!")
@@ -207,6 +192,9 @@ function computeN1withN2(n1,n2) {
 
 function operatorClicked(event) {
     
+    n1active = n2active = n3active = false;
+    // opActive = true;
+
     if (!NumberClicked) return
 
     // console.log(this.textContent)
@@ -298,15 +286,76 @@ function appendEquals() {
 }
 
 
+
+function deleteClicked() {
+    let foundTrue;
+    activeObj = {n1active, n2active, n3active}
+    
+    for (key in activeObj) {
+        if (activeObj[key] === true) {
+            foundTrue = key;
+        } 
+    }
+
+    console.log(` true one is: ${foundTrue}`);
+
+    currentText = currentScreen.textContent;
+    
+
+    switch (foundTrue) {
+        case 'n1active':
+            console.log(`n1array length = ${n1Array.length}`)
+            if (!(n1Array.length <= 1)) {
+                n1Array.pop(); 
+                currentText = currentText.slice(0,-1);
+                currentScreen.textContent = currentText; 
+            }
+            break;
+
+        case 'n2active':
+            console.log(`n1array length = ${n1Array.length}`)
+            if (!(n2Array.length <= 1)) {
+                n2Array.pop();
+                currentText = currentText.slice(0,-1);
+                currentScreen.textContent = currentText; 
+            } 
+            break;
+
+        case 'n3active':
+            console.log(`n1array length = ${n1Array.length}`)
+            if (!(n3Array.length <= 0)) {
+                n3Array.pop(); 
+                currentText = currentText.slice(0,-1);
+                currentScreen.textContent = currentText; 
+            }
+            break;
+
+        case 'opActive':
+            // console.log("opactivee")
+            // currentText = currentText.slice(0,-1);
+            // currentScreen.textContent = currentText; 
+            // console.log(`n1array length = ${n1Array.length}`)
+            // if (!(n3Array.length <= 1)) n3Array.pop(); 
+            break;
+    
+    
+        default:
+            break;
+    }
+
+}
+
+
 function pair () {
     digits.forEach((digit) => digit.addEventListener('click', n1digitClicked));
     operators.forEach((operator) => operator.addEventListener('click', operatorClicked))
     equals.addEventListener('click', appendEquals);
     clear.addEventListener('click', () => location.reload())
+    del.addEventListener('click', deleteClicked)
 }
 
 function initiate() {
-    initVariables();
+    // initVariables();
     pair();
 }
 
